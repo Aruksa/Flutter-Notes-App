@@ -34,76 +34,71 @@ class _RegisterViewState extends State<RegisterView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Register'),
+        title: const Text("Register"),
       ),
-      body: FutureBuilder(
-        future: Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        ),
-        builder: (context, snapshot){
-          switch (snapshot.connectionState){
+      body: Column(
+        children: [
+          Card(
+            child: TextField(
+              controller: _email,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                hintText: "Type Email Here",
+              ),
+            ),
+          ),
+          Card(
+            child: TextField(
+              controller: _password,
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: const InputDecoration(
+                hintText: "Type Password Here",
+              ),
+            ),
+          ),
+          Card(
+            child: TextButton(
 
-            case ConnectionState.done:
-              return Column(
-                children: [
-                  Card(
-                    child: TextField(
-                      controller: _email,
-                      enableSuggestions: false,
-                      autocorrect: false,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        hintText: "Type Email Here",
-                      ),
-                    ),
-                  ),
-                  Card(
-                    child: TextField(
-                      controller: _password,
-                      obscureText: true,
-                      enableSuggestions: false,
-                      autocorrect: false,
-                      decoration: const InputDecoration(
-                        hintText: "Type Password Here",
-                      ),
-                    ),
-                  ),
-                  Card(
-                    child: TextButton(
+                onPressed: () async {
 
-                        onPressed: () async {
+                  final email = _email.text;
+                  final password = _password.text;
+                  try {
+                    final userCredential = await FirebaseAuth.instance
+                        .createUserWithEmailAndPassword(
+                        email: email,
+                        password: password
+                    );
+                    print(userCredential);
+                  } on FirebaseAuthException catch (e) {
+                    if (e.code == "weak-password") {
+                      print("Weak Password");
+                    }
+                    else if (e.code == "email-already-in-use") {
+                      print("This email is already in use");
+                    }
+                    else if (e.code == "invalid-email"){
+                      print("This email is invalid");
+                    }
+                  }
+                },
+                child: const Text("Register")
 
-                          final email = _email.text;
-                          final password = _password.text;
-                          try {
-                            final userCredential = await FirebaseAuth.instance
-                                .createUserWithEmailAndPassword(
-                                email: email,
-                                password: password
-                            );
-                            print(userCredential);
-                          } on FirebaseAuthException catch (e) {
-                            if (e.code == "weak-password") {
-                              print("Weak Password");
-                            }
-                            else if (e.code == "email-already-in-use") {
-                              print("This email is already in use");
-                            }
-                            else if (e.code == "invalid-email"){
-                              print("This email is invalid");
-                            }
-                          }
-                        },
-                        child: const Text("Register")
-
-                    ),
-                  ),
-                ],
-              );
-            default:
-              return const Text("Loading...");
+            ),
+          ),
+          TextButton(onPressed: () {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+                '/login/',
+                    (route) => false
+            );
           }
-        },
+              , child: const Text("Not a New User? Login Here!")
+          )
+        ],
       ),
     );
   }
