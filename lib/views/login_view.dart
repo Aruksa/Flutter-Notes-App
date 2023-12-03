@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pilot/constants/routes.dart';
 import '../firebase_options.dart';
 
 class LoginView extends StatefulWidget {
@@ -72,6 +73,7 @@ class _LoginViewState extends State<LoginView> {
                         password: password
                     );
                     print(userCredential);
+                    Navigator.of(context).pushNamedAndRemoveUntil('/pilot/', (route) => false,);
                   } on FirebaseAuthException catch(e) {
                     if (e.code == "INVALID_LOGIN_CREDENTIALS") {
                       print("Invalid Credentials");
@@ -84,7 +86,7 @@ class _LoginViewState extends State<LoginView> {
           ),
           TextButton(onPressed: () {
             Navigator.of(context).pushNamedAndRemoveUntil(
-                '/register/',
+                registerRoute,
                     (route) => false
             );
           },
