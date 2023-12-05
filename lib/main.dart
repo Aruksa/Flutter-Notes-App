@@ -1,5 +1,3 @@
-import 'dart:js';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -33,7 +31,7 @@ void main() {
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-
+@override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: Firebase.initializeApp(
@@ -84,7 +82,7 @@ class _PilotViewState extends State<PilotView> {
               switch (value) {
                 case MenuAction.logout:
                   final shouldLogout = await showLogOutDialog(context);
-                  devtools.log(shouldLogout.toString()); //not value.toString()
+                  devtools.log(shouldLogout.toString());
                   if (shouldLogout) {
                     await FirebaseAuth.instance.signOut();
                     Navigator.of(context).pushNamedAndRemoveUntil(
@@ -96,7 +94,7 @@ class _PilotViewState extends State<PilotView> {
             },
             itemBuilder: (context) {
               return const [
-              const PopupMenuItem<MenuAction>(
+              PopupMenuItem<MenuAction>(
                 value: MenuAction.logout,
                 child: Icon(Icons.logout, color: Colors.pinkAccent),
               ),
