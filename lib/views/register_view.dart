@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:pilot/constants/routes.dart';
 import 'dart:developer' as devtools show log;
 
+import '../utilities/show_error_dialog.dart';
+
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -74,6 +76,9 @@ class _RegisterViewState extends State<RegisterView> {
                         password: password
                     );
                     devtools.log(userCredential.toString());
+                    final user = FirebaseAuth.instance.currentUser;
+                    await user?.sendEmailVerification();
+                    Navigator.of(context).pushNamed(verifyEmailRoute);
                   } on FirebaseAuthException catch (e) {
                     if (e.code == "weak-password") {
                       await showErrorDialog(context, "Weak Password",);
@@ -83,7 +88,11 @@ class _RegisterViewState extends State<RegisterView> {
                     }
                     else if (e.code == "invalid-email"){
                       await showErrorDialog(context, "Invalid Email",);
-                    }
+                    } else {
+                  await showErrorDialog(context, 'Error:${e.code}');
+                  }
+                  } catch(e) {
+                  await showErrorDialog(context, e.toString());
                   }
                 },
                 child: const Text("Register")
@@ -105,28 +114,7 @@ class _RegisterViewState extends State<RegisterView> {
 }
 
 
-Future<void> showErrorDialog(       //overlays are too complicated so we using this instead
-    BuildContext context,
-    String text,
-    ) {
-  return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Error!"),
-          content: Text(text),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("OK"),
-            ),
-          ],
-        );
-      }
-  );
- }
+
 
 
 
