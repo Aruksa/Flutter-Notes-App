@@ -29,7 +29,6 @@ class _RegisterViewState extends State<RegisterView> {
     _email.dispose();
     _password.dispose();
     super.dispose();
-
   }
 
   @override
@@ -64,9 +63,7 @@ class _RegisterViewState extends State<RegisterView> {
           ),
           Card(
             child: TextButton(
-
                 onPressed: () async {
-
                   final email = _email.text;
                   final password = _password.text;
                   try {
@@ -89,7 +86,6 @@ class _RegisterViewState extends State<RegisterView> {
                   }
                 },
                 child: const Text("Register")
-
             ),
           ),
           TextButton(onPressed: () {
@@ -97,8 +93,8 @@ class _RegisterViewState extends State<RegisterView> {
                 loginRoute,
                     (route) => false
             );
-          }
-              , child: const Text("Not a New User? Login Here!")
+          },
+            child: const Text("Not a New User? Login Here!")
           )
         ],
       ),

@@ -14,6 +14,7 @@ class PilotView extends StatefulWidget {
 }
 
 class _PilotViewState extends State<PilotView> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +22,7 @@ class _PilotViewState extends State<PilotView> {
         title: const Text("Main UI"),
         actions: [
           PopupMenuButton<MenuAction>(
-            onSelected: (value) async  {
+            onSelected: (value) async {
               switch (value) {
                 case MenuAction.logout:
                   final shouldLogout = await showLogOutDialog(context);
@@ -63,11 +64,12 @@ Future<bool> showLogOutDialog(BuildContext context) {
         actions: [
           TextButton(onPressed: () {
             Navigator.of(context).pop(false);
-
-          }, child: const Text("Cancel")),
+          },
+            child: const Text("Cancel")),
           TextButton(onPressed: () {
             Navigator.of(context).pop(true);
-          }, child: const Text("Logout")),
+          },
+            child: const Text("Logout")),
         ],
       );
     },

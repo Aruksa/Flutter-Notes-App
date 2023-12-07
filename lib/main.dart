@@ -12,7 +12,6 @@ void main() {
   runApp(MaterialApp(
     title: 'Flutter Demo',
     theme: ThemeData(
-
       primarySwatch: Colors.pink,
     ),
     home: const HomePage(),
@@ -21,10 +20,9 @@ void main() {
       registerRoute: (context) => const RegisterView(),
       pilotRoute: (context) => const PilotView(),
       verifyEmailRoute: (context) => const VerifyEmailView(),
-
-    },
-  ),
-  );
+      },
+    ),
+  );  //runApp ending
 }
 
 class HomePage extends StatelessWidget {
@@ -36,19 +34,19 @@ class HomePage extends StatelessWidget {
       future: AuthService.firebase().initialize(),
       builder: (context, snapshot){
         switch (snapshot.connectionState){
-
           case ConnectionState.done:
           final user = AuthService.firebase().currentUser;
           if (user!= null) {
             if (user.isEmailVerified) {
               return const PilotView();
-            } else {
+            }
+            else {
               return const VerifyEmailView();
             }
-          } else {
+          }
+          else {
             return const LoginView();
           }
-
           default:
             return const CircularProgressIndicator();
         }

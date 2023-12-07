@@ -27,9 +27,7 @@ class _LoginViewState extends State<LoginView> {
     _email.dispose();
     _password.dispose();
     super.dispose();
-
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -63,9 +61,7 @@ class _LoginViewState extends State<LoginView> {
           ),
           Card(
             child: TextButton(
-
                 onPressed: () async {
-
                   final email = _email.text;
                   final password = _password.text;
                   try{
@@ -76,7 +72,8 @@ class _LoginViewState extends State<LoginView> {
                     final user = AuthService.firebase().currentUser;
                     if (user?.isEmailVerified == true){
                       Navigator.of(context).pushNamedAndRemoveUntil(pilotRoute, (route) => false);
-                    } else {
+                    }
+                    else {
                       Navigator.of(context).pushNamedAndRemoveUntil(verifyEmailRoute, (route) => false);
                     }
                   } on InvalidCredentialsAuthException {
@@ -86,7 +83,6 @@ class _LoginViewState extends State<LoginView> {
                   }
                 },
                 child: const Text("Login"),
-
             ),
           ),
           TextButton(onPressed: () {
@@ -95,7 +91,7 @@ class _LoginViewState extends State<LoginView> {
                     (route) => false
             );
           },
-              child: const Text("Not Registered Yet? Register!"),
+            child: const Text("Not Registered Yet? Register!"),
           )
         ],
       ),
