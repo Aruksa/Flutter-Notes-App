@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:pilot/services/crud/crud_exceptions.dart';
 import 'package:sqflite/sqflite.dart';
@@ -7,7 +8,37 @@ import 'package:path/path.dart' show join;
 class PilotService{
   Database? _db;
 
+  List<DatabasePilot> _pilots = [];
+
+  //singleton
+  static final PilotService _shared = PilotService._sharedInstance();
+  PilotService._sharedInstance();
+  factory PilotService() => _shared;
+
+  final _pilotsStreamController = StreamController<List<DatabasePilot>>.broadcast(); //its okay to create new listeners (broadcast)
+
+  Stream<List<DatabasePilot>> get allPilots => _pilotsStreamController.stream;
+
+  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+    try {
+      final user = await getUser(email: email);
+      return user;
+    } on CouldNotFindUser {
+      final createdUser = await createUser(email: email);
+      return createdUser;
+    } catch(e) {
+      rethrow;
+    }
+  }
+
+  Future<void> _cachePilots() async {
+    final allPilots = await getAllPilots();
+    _pilots = allPilots.toList();
+    _pilotsStreamController.add(_pilots);
+  }
+
   Future<DatabasePilot> updatePilot({required DatabasePilot pilot, required String text,}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     await getPilot(id: pilot.id);
     final updatesCount = await db.update(pilotTable, {
@@ -18,18 +49,24 @@ class PilotService{
     if (updatesCount == 0) {
       throw CouldNotUpdatePilot();
     } else {
-      return await getPilot(id: pilot.id);
+      final updatedPilot = await getPilot(id: pilot.id);
+      _pilots.removeWhere((pilot) => pilot.id == updatedPilot.id);
+      _pilots.add(updatedPilot);
+      _pilotsStreamController.add(_pilots);
+      return updatedPilot;
     }
   }
 
 
   Future<Iterable<DatabasePilot>> getAllPilots () async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final pilots = await db.query(pilotTable);
     return pilots.map((pilotRow) => DatabasePilot.fromRow(pilotRow));
   }
 
   Future<DatabasePilot> getPilot({required int id}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final pilots = await db.query(
       pilotTable,
@@ -41,16 +78,25 @@ class PilotService{
     if (pilots.isEmpty) {
       throw CouldNotFindPilot();
     } else {
-      return DatabasePilot.fromRow(pilots.first);
+      final pilot = DatabasePilot.fromRow(pilots.first);
+      _pilots.removeWhere((pilot) => pilot.id == id);
+      _pilots.add(pilot);
+      _pilotsStreamController.add(_pilots);
+      return pilot;
     }
   }
 
   Future<int> deleteAllPilots() async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
-    return await db.delete(pilotTable);
+    final numberOfDeletions = await db.delete(pilotTable);
+    _pilots = [];  //redeclare
+    _pilotsStreamController.add(_pilots);
+    return numberOfDeletions;
   }
 
   Future<void> deletePilot({required String id}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
       userTable,
@@ -59,10 +105,14 @@ class PilotService{
     );
     if (deletedCount == 0) {
       throw CouldNotDeletePilot();
+    } else {
+      _pilots.removeWhere((pilot) => pilot.id == id);
+      _pilotsStreamController.add(_pilots);
     }
   }
 
   Future<DatabasePilot> createPilot({required DatabaseUser owner}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
 
     //make sure the email and its corresponding id are correct
@@ -78,11 +128,17 @@ class PilotService{
       isSyncedWithCloudColumn: 1,
     });
 
-    final note = DatabasePilot(id: pilotId, userId: owner.id, text: text, isSyncedWithCloud: true);
-    return note;
+    final pilot = DatabasePilot(id: pilotId, userId: owner.id, text: text, isSyncedWithCloud: true);
+
+    _pilots.add(pilot);
+    _pilotsStreamController.add(_pilots);
+
+    return pilot;
+
   }
 
   Future<DatabaseUser> getUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final results = await db.query(
       userTable,
@@ -100,6 +156,7 @@ class PilotService{
   }
 
   Future<DatabaseUser> createUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final results = await db.query(
       userTable,
@@ -119,6 +176,7 @@ class PilotService{
   }
 
   Future<void> deleteUser({required String email}) async {
+    await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
       userTable,
@@ -149,6 +207,14 @@ class PilotService{
     }
   }
 
+  Future<void> _ensureDbIsOpen() async {
+    try{
+      await open();
+    } on DatabaseAlreadyOpenException {
+      //empty //cuz bar bar database open kora waste
+    }
+  }
+
   Future<void> open() async {
     if (_db != null) {
       throw DatabaseAlreadyOpenException;
@@ -161,13 +227,13 @@ class PilotService{
 
       await db.execute(createUserTable);
       await db.execute(createPilotTable);
+      await _cachePilots();
 
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocumentsDirectory();
     }
   }
 }
-
 
 @immutable
 class DatabaseUser {

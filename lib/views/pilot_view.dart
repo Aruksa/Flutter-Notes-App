@@ -6,6 +6,8 @@ import '../constants/routes.dart';
 import '../enums/menu_action.dart';
 import 'dart:developer' as devtools show log;
 
+import '../services/crud/pilot_service.dart';
+
 class PilotView extends StatefulWidget {
   const PilotView({super.key});
 
@@ -14,6 +16,21 @@ class PilotView extends StatefulWidget {
 }
 
 class _PilotViewState extends State<PilotView> {
+  late final PilotService _pilotService;
+  String get userEmail => AuthService.firebase().currentUser!.email!; //force unwrap??
+
+  @override
+  void initState() {
+    _pilotService = PilotService(); //importing pilot_service pura ekta instance
+    _pilotService.open();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _pilotService.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +64,30 @@ class _PilotViewState extends State<PilotView> {
           )
         ],
       ),
-      body: const Text("Hello World!"),
+      body: FutureBuilder(
+        future: _pilotService.getOrCreateUser(email: userEmail),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.done:
+              return StreamBuilder(
+                  stream: _pilotService.allPilots,
+                  builder: (context,snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return const Text("Waiting for all pilots...");
+                      default:
+                        return const CircularProgressIndicator();
+                    }
+                  },
+              );
+            default:
+              return const CircularProgressIndicator();
+          }
+        },
+      ),
     );
   }
 }
-
 
 Future<bool> showLogOutDialog(BuildContext context) {
 
