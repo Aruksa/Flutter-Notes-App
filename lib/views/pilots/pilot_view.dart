@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:pilot/services/auth/auth_service.dart';
-import '../constants/routes.dart';
-import '../enums/menu_action.dart';
+import '../../constants/routes.dart';
+import '../../enums/menu_action.dart';
 import 'dart:developer' as devtools show log;
 
-import '../services/crud/pilot_service.dart';
+import '../../services/crud/pilot_service.dart';
 
 class PilotView extends StatefulWidget {
   const PilotView({super.key});
@@ -36,8 +36,13 @@ class _PilotViewState extends State<PilotView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Main UI"),
+        title: const Text("Your Pilots"),
         actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(newPilotRoute);
+              },
+              icon: const Icon(Icons.add)),
           PopupMenuButton<MenuAction>(
             onSelected: (value) async {
               switch (value) {

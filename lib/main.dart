@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pilot/constants/routes.dart';
 import 'package:pilot/services/auth/auth_service.dart';
 import 'package:pilot/views/login_view.dart';
-import 'package:pilot/views/pilot_view.dart';
+import 'package:pilot/views/pilots/new_pilot_view.dart';
+import 'package:pilot/views/pilots/pilot_view.dart';
 import 'package:pilot/views/register_view.dart';
 import 'package:pilot/views/verify_email_view.dart';
 import 'dart:developer' as devtools show log;
@@ -20,7 +21,7 @@ void main() {
       registerRoute: (context) => const RegisterView(),
       pilotRoute: (context) => const PilotView(),
       verifyEmailRoute: (context) => const VerifyEmailView(),
-      },
+      newPilotRoute: (context) => const NewPilotView(),      },
     ),
   );  //runApp ending
 }
