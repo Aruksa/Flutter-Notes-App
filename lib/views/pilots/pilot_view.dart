@@ -1,12 +1,10 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:pilot/services/auth/auth_service.dart';
 import '../../constants/routes.dart';
 import '../../enums/menu_action.dart';
 import 'dart:developer' as devtools show log;
-
 import '../../services/crud/pilot_service.dart';
+import '../../main.dart';
 
 class PilotView extends StatefulWidget {
   const PilotView({super.key});
@@ -59,8 +57,8 @@ class _PilotViewState extends State<PilotView> {
               }
             },
             itemBuilder: (context) {
-              return const [
-                PopupMenuItem<MenuAction>(
+              return [
+                const PopupMenuItem<MenuAction>(
                   value: MenuAction.logout,
                   child: Icon(Icons.logout, color: Colors.pinkAccent),
                 ),
@@ -79,6 +77,7 @@ class _PilotViewState extends State<PilotView> {
                   builder: (context,snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.waiting:
+                      case ConnectionState.active:
                         return const Text("Waiting for all pilots...");
                       default:
                         return const CircularProgressIndicator();
