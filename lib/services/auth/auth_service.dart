@@ -7,13 +7,13 @@ class AuthService implements AuthProvider{
   const AuthService(this.provider);
 
   factory AuthService.firebase() => AuthService(   //it creates an instance from the firebase auth provider
-    FirebaseAuthProvider(),
-  );
+    FirebaseAuthProvider());
 
   @override
   Future<AuthUser> createUser({
     required String email,
-    required String password}) =>
+    required String password,
+  }) =>
       provider.createUser(email: email, password: password);
 
 
@@ -23,7 +23,8 @@ class AuthService implements AuthProvider{
   @override
   Future<AuthUser> logIn({
     required String email,
-    required String password}) =>
+    required String password,
+  }) =>
       provider.logIn(email: email, password: password);
 
   @override

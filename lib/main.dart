@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pilot/constants/routes.dart';
 import 'package:pilot/services/auth/auth_service.dart';
 import 'package:pilot/views/login_view.dart';
-import 'package:pilot/views/pilots/new_pilot_view.dart';
-import 'package:pilot/views/pilots/pilot_view.dart';
+import 'package:pilot/views/notes/new_note_view.dart';
+import 'package:pilot/views/notes/notes_view.dart';
 import 'package:pilot/views/register_view.dart';
 import 'package:pilot/views/verify_email_view.dart';
 import 'dart:developer' as devtools show log;
@@ -19,9 +19,10 @@ void main() {
     routes: {
       loginRoute: (context) => const LoginView(),
       registerRoute: (context) => const RegisterView(),
-      pilotRoute: (context) => const PilotView(),
+      noteRoute: (context) => const NoteView(),
       verifyEmailRoute: (context) => const VerifyEmailView(),
-      newPilotRoute: (context) => const NewPilotView(),      },
+      newNoteRoute: (context) => const NewNoteView(),
+      },
     ),
   );  //runApp ending
 }
@@ -39,7 +40,7 @@ class HomePage extends StatelessWidget {
           final user = AuthService.firebase().currentUser;
           if (user!= null) {
             if (user.isEmailVerified) {
-              return const PilotView();
+              return const NoteView();
             }
             else {
               return const VerifyEmailView();
@@ -56,7 +57,28 @@ class HomePage extends StatelessWidget {
   }
 }
 
+Future<bool> showLogOutDialog(BuildContext context) {
 
+  return showDialog<bool>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text("Sign Out!"),
+        content: const Text("Are you sure you want to sign out?"),
+        actions: [
+          TextButton(onPressed: () {
+            Navigator.of(context).pop(false);
+          },
+              child: const Text("Cancel")),
+          TextButton(onPressed: () {
+            Navigator.of(context).pop(true);
+          },
+              child: const Text("Logout")),
+        ],
+      );
+    },
+  ).then((value) => value ?? false);
+}
 
 
 

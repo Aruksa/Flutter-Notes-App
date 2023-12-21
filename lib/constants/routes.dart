@@ -1,5 +1,5 @@
 const loginRoute = '/login/';
 const registerRoute = '/register/';
-const pilotRoute = '/pilot/';
+const noteRoute = '/note/';
 const verifyEmailRoute = '/verify-email/';
-const newPilotRoute = '/pilots/new-pilot/';
+const newNoteRoute = '/notes/new-note/';
