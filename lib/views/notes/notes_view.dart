@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pilot/services/auth/auth_service.dart';
 import 'package:pilot/services/crud/notes_services.dart';
+import 'package:pilot/utilities/dialogs/logout_dialog.dart';
+import 'package:pilot/views/notes/notes_list_view.dart';
 import '../../constants/routes.dart';
 import '../../enums/menu_action.dart';
 import '../../main.dart';
@@ -68,20 +70,10 @@ class _NoteViewState extends State<NoteView> {
                       if (snapshot.hasData)
                       {
                         final allNotes = snapshot.data as List<DatabaseNote>;
-                        return ListView.builder
-                          (
-                            itemCount: allNotes.length,
-                            itemBuilder: (context, index)
-                            {
-                              final note = allNotes[index];
-                              return ListTile(
-                                title: Text(
-                                    note.text,
-                                    maxLines: 1,
-                                    softWrap: true,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                );
+                        return NotesListView(
+                            notes: allNotes,
+                            onDeleteNote: (note) async {
+                              await _noteService.deleteNote(id: note.id);
                             },
                         );
                       } else {
