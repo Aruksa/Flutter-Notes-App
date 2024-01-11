@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:pilot/services/cloud/cloud_note.dart';
 import 'package:pilot/utilities/dialogs/delete_dialog.dart';
 import '../../services/crud/notes_services.dart';
 
-typedef NoteCallback = void Function(DatabaseNote note);
+typedef NoteCallback = void Function(CloudNote note);
 
 class NotesListView extends StatelessWidget {
-  final List<DatabaseNote> notes;
+  final Iterable<CloudNote> notes;
   final NoteCallback onDeleteNote;
   final NoteCallback onTap;
 
@@ -23,7 +24,7 @@ class NotesListView extends StatelessWidget {
       itemCount: notes.length,
       itemBuilder: (context, index)
       {
-        final note = notes[index];
+        final note = notes.elementAt(index);
         return ListTile(
           onTap: () {
             onTap(note);
