@@ -1,16 +1,10 @@
-# pilot
+# Note-App-with-Flutter
 
-A new Flutter project.
+- Users can log in with email and password
+- Email verification is included
+- Data about User and Password is saved on Firebase
+- Notes can be created
+- Notes can be deleted
+- The notes are user-specific -- one person cannot view another person's notes 
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
