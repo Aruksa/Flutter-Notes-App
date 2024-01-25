@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:pilot/constants/routes.dart';
 import 'package:pilot/services/auth/auth_exceptions.dart';
 import 'package:pilot/services/auth/bloc/auth_bloc.dart';
 import 'package:pilot/services/auth/bloc/auth_event.dart';
 import 'package:pilot/utilities/dialogs/error_dialog.dart';
+
+import '../services/auth/bloc/auth_state.dart';
 
 
 class LoginView extends StatefulWidget {
@@ -19,7 +22,8 @@ class _LoginViewState extends State<LoginView> {
   late final TextEditingController _password;
 
   @override
-  void initState() { //initState() is a method that is called once when the Stateful Widget is inserted in the widget tree
+  void initState() {
+    //initState() is a method that is called once when the Stateful Widget is inserted in the widget tree
     _email = TextEditingController();
     _password = TextEditingController();
     super.initState();
@@ -63,24 +67,29 @@ class _LoginViewState extends State<LoginView> {
             ),
           ),
           Card(
-            child: TextButton(
+            child: BlocListener<AuthBloc, AuthState>(
+              listener: (context, state) async {
+                if (state is AuthStateLoggedOut) {
+                  if (state.exception is InvalidCredentialsAuthException) {
+                    await showErrorDialog(context, 'Invalid credentials!');
+                  } else if (state.exception is GenericAuthException) {
+                    await showErrorDialog(context, 'Authentication Error!');
+                  }
+                }
+              },
+              child: TextButton(
                 onPressed: () async {
                   final email = _email.text;
                   final password = _password.text;
-                  try{
-                    context.read<AuthBloc>().add(
-                      AuthEventLogIn(
-                          email,
-                          password,
-                      ),
-                    );
-                  } on InvalidCredentialsAuthException {
-                    await showErrorDialog(context, "Invalid Login Credentials",);
-                  } on GenericAuthException {
-                    await showErrorDialog(context, "Authentication Error",);
-                  }
+                  context.read<AuthBloc>().add(
+                    AuthEventLogIn(
+                      email,
+                      password,
+                    ),
+                  );
                 },
                 child: const Text("Login"),
+              ),
             ),
           ),
           TextButton(onPressed: () {
